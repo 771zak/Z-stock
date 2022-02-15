@@ -1,18 +1,37 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {TouchableOpacity, StyleSheet, Alert, Button, View, TextInput, Text, KeyboardAvoidingView} from 'react-native';
+import {
+	getAuth, 
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword
+} from "firebase/auth"
 
 const LoginScreen = ({navigation}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPass, setShowPass] = useState(true);
 
+	useEffect(()=>{
+		const unsubscribe = getAuth().onAuthStateChanged(user=>{
+			if (user) {
+				navigation.replace("Home")
+			}
+		})
+	}, [])
+
 	const handleSignIn= () => {
 		let cred = {
 			userEmail: email,
 			userPassword: password
 		};
-		if (cred.userEmail != "" || cred.userPassword != password) {
-			navigation.navigate("Home");
+		if (cred.userEmail != "" || cred.userPassword != "") {
+			const auth = new getAuth();
+			signInWithEmailAndPassword(auth, email, password)
+				.then((userCred) =>{
+					console.log("logged in with: ", userCred.user.email);
+					navigation.navigate("Home");
+				})
+				.catch(err => console.log(err.message));
 			setEmail('');
 			setPassword('');
 		} else {
@@ -24,7 +43,15 @@ const LoginScreen = ({navigation}) => {
 	}
 
 	const handleSignUp= () => {
-		console.log("signUp")
+		const auth = getAuth();
+		createUserWithEmailAndPassword(auth, email, password)
+			.then((userCred)=>{
+				const user = userCred.user;
+				console.log(user);
+			})
+			.catch((error) => {
+				console.log(error.message);
+			})
 	}
 
 	return (

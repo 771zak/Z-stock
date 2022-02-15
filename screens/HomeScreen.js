@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, Button} from 'react-native';
+import {StyleSheet, View, Text, Button, TouchableOpacity} from 'react-native';
 import {BarCodeScanner} from "expo-barcode-scanner";
 import {db} from "../firebase"
 import {collection, addDoc} from "firebase/firestore"
+import {getAuth, signOut} from "firebase/auth"
 
 const HomeScreen = ({navigation}) => {
 	
@@ -19,11 +20,19 @@ const HomeScreen = ({navigation}) => {
 		}
 	}
 
+	const signOut = () =>{
+		getAuth()
+			.signOut()
+			.then(() =>{
+				navigation.replace("Login")
+			})
+	}
 
 	const [hasPermission, setHasPermission] = useState(null);
 	const [scanned, setScanned] = useState(false);
 	const [showScanner, setShowScanner] = useState(false);
 	const [barCode, setBarCode] = useState(null)
+	const [showBar, setShowBar] = useState(false)
 
 	const handleOpen = () => {
 		setScanned(false)
@@ -39,9 +48,14 @@ const HomeScreen = ({navigation}) => {
   }, []);
 
 	const handleBarScan = ({type, data}) => {
-		setScanned(true);
 		setBarCode(data);
+		setScanned(true);
 		setShowScanner(false);
+	}
+
+	const handleShowScan = ()=>{
+		setShowScanner(!showScanner);
+		setScanned(false);
 	}
 
 	if (hasPermission === null) {
@@ -51,6 +65,7 @@ const HomeScreen = ({navigation}) => {
     return <Text>No access to camera</Text>;
   }
 
+	const button = <Button onPress={()=>{setScanned(false)}} title="scan"/>
 	return (
 		<View style={styles.HomeScreen}>
 			<Text style={{color: "red"}}>{barCode != null ? `barCode is ${barCode}`: "waiting for barCode"}</Text>
@@ -58,18 +73,17 @@ const HomeScreen = ({navigation}) => {
 				onBarCodeScanned={scanned? undefined : handleBarScan }
 				style={showScanner? styles.scanner : styles.absoluteFillObject}
 			/>
-			<Button
-				title="scan"
-				onPress={()=>{setScanned(false)}}
-			/>
-			<Button
-				title={showScanner? "close" : "Open"}
-				onPress={handleOpen}
-			/>
-			<Button
-				title="db"
-				onPress={Create}
-			/>
+			<View style={showBar ? styles.showSideBar: styles.hideSideBar}>
+				<TouchableOpacity onPress={signOut}><Text>signout</Text></TouchableOpacity>
+			</View>
+			<View style={styles.bottomNav}>
+				<Button
+					title="show"
+					onPress={handleShowScan}
+				/>
+				{showScanner ? button : null}
+				<Button title="ijisl" onPress={()=>{setShowBar(!showBar)}}/>
+			</View>
 		</View>
 	)
 }
@@ -93,5 +107,24 @@ const styles = StyleSheet.create({
 		right: 0,
 		height: 500,
 		width: 500
+	},
+	bottomNav: {
+		width: "100%",
+		height: 70,
+		position: "absolute",
+		bottom: 0,
+		backgroundColor: "#fff",
+		flex: 1,
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "row"
+	},
+	showSideBar: {
+		width: "70%",
+		height: "100%",
+		backgroundColor: "#fff",
+		position: "absolute",
+		left: 0,
+		top: 0,
 	}
 })
