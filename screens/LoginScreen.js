@@ -1,23 +1,38 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, StyleSheet, View, TextInput, Text, KeyboardAvoidingView} from 'react-native';
-import {auth} from "../firebase";
+import {TouchableOpacity, StyleSheet, Alert, Button, View, TextInput, Text, KeyboardAvoidingView} from 'react-native';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [showPass, setShowPass] = useState(true);
 
-	const handleSignUp = () => {
-		auth
-			.createUserWithEmailAndPassword(email, password)
-			.then(userCredentials => {
-				const user = userCredentials.user;
-				console.log(user.email);
-			})
-			.catch(error => alert(error.message));
+	const handleSignIn= () => {
+		let cred = {
+			userEmail: email,
+			userPassword: password
+		};
+		if (cred.userEmail != "" || cred.userPassword != password) {
+			navigation.navigate("Home");
+			setEmail('');
+			setPassword('');
+		} else {
+			Alert.alert(
+				"Wrong email or password",
+				"Please renter email and password again!."
+			)
+		}
+	}
+
+	const handleSignUp= () => {
+		console.log("signUp")
 	}
 
 	return (
-		<KeyboardAvoidingView style={styles.container} behavior="padding">
+		<KeyboardAvoidingView 
+			style={styles.container} 
+			behavior="padding"
+			keyboardVerticalOffset={-600}
+		>
 			<View style={styles.inputContainer}>
 				<TextInput
 					placeholder="Email"
@@ -30,12 +45,21 @@ const LoginScreen = () => {
 					value={password}
 					onChangeText={text => setPassword(text)}
 					style={styles.input}
-					secureTextEntry
+					secureTextEntry={showPass}
 				/>
+				<TouchableOpacity 
+					style={styles.showPass}
+					onPress={()=>{
+						setShowPass(!showPass);
+					}}
+				>
+					<Text style={{color: "white"}}>{showPass?"Show":"Hide"}</Text>
+				</TouchableOpacity>
 			</View>
 			<View style={styles.buttonContainer}>
 				<TouchableOpacity
 					style={styles.button}
+					onPress={handleSignIn}
 				>
 					<Text style={{ color: "white", fontSize: 16 }}>Log in</Text>
 				</TouchableOpacity>
@@ -60,18 +84,20 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	inputContainer: {
-		width: "80%",
+		width: "90%",
 	},
 	input: {
 		backgroundColor: "white",
-		padding: 10,
+		padding: 15,
 		fontSize: 16,
 		marginTop: 7,
+		marginBottom: 10,
 		borderRadius: 12,
 		shadowColor: "red",
 		shadowOffset: { width: 20, height: 10 },
 		elevation: 2,
 		shadowOpacity: 2,
+		position: "relative",
 	},
 	buttonContainer: {
 		width: "60%",
@@ -92,5 +118,17 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		borderColor: "#333",
 		borderWidth: 2,
+	},
+	showPass: {
+		backgroundColor: "#333",
+		height: 57.5,
+		width: 50,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		position: "absolute",
+		bottom: 10,
+		right: 0,
+		elevation: 3,
 	}
 })
