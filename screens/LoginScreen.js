@@ -14,6 +14,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import Icon from "react-native-vector-icons/Entypo";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -110,12 +111,21 @@ const LoginScreen = ({ navigation }) => {
             setShowPass(!showPass);
           }}
         >
-          <Text style={{ color: "#320617", fontSize: 16 }}>{showPass ? "Show" : "Hide"}</Text>
+					<Icon 
+						name={showPass ? "eye": "eye-with-line"}
+						style={{fontSize:22, color: "#320617"}}
+					/>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleSignIn}>
           <Text style={{ color: "white", fontSize: 16 }}>Log in</Text>
+					<Icon 
+						name="login"
+						type="entypo"
+						color="#333"
+						style={{fontSize: 18, marginLeft: 5}}
+					/>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleSignUp} style={styles.buttonOutline}>
           <Text style={{ color: "#333", fontSize: 16 }}>Register</Text>
@@ -156,6 +166,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 13,
     borderRadius: 10,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
   },
   buttonOutline: {
     padding: 7,

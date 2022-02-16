@@ -22,8 +22,20 @@ const Tab = createBottomTabNavigator();
 
 const HomeScreenTabs = ()=>(
 		<Tab.Navigator 
-			screenOptions={{headerShown: false}}
-			tabBarOptions={{activeTintColor:"#EF1A69"}}
+			screenOptions={{
+				headerShown: false,
+				tabBarStyle: {
+					position: "absolute",
+					borderRadius: 10,
+					bottom: 15,
+					left: 10,
+					right: 10,
+				},
+			tabBarHideOnKeyboard: true,
+			}}
+			tabBarOptions={{
+				activeTintColor:"#EF1A69",
+			}}
 		>
 			<Tab.Screen 
 				name="Home" 
@@ -49,7 +61,7 @@ const HomeScreenTabs = ()=>(
 				name="info" 
 				component={InfoScreen} 
 				options={{
-					tabBarLabel: "Add",
+					tabBarLabel: "Info",
 					tabBarIcon: ({color, size}) => (
 						<MaterialCommunityIcons name="information" color={color} size={size}/>
 				)
