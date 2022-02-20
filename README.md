@@ -17,3 +17,5 @@
 - [Lottie animation](https://lottiefiles.com)
 
 ### Screenshots :
+
+![LoginScreen] (/assets/screenshots/Login "Login screen") 
