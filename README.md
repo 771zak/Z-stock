@@ -18,4 +18,4 @@
 
 ### Screenshots :
 
-![LoginScreen] (/assets/screenshots/Login.png "Login screen") 
+![LoginScreen] (/assets/screenshots/Login.png) 
