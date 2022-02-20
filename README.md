@@ -18,4 +18,4 @@
 
 ### Screenshots :
 
-![LoginScreen] (/assets/screenshots/Login.png) 
+![LoginScreen] (https://github.com/zak771/Z-stock/assets/screenshots/Login.png) 
