@@ -1,20 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { 
+	StyleSheet, 
+	View, 
+	Text, 
+	TextInput, 
+	FlatList,
+	Button, 
+	TouchableOpacity,
+	ScrollView
+} from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { db } from "../firebase";
-import { collection, getDocs} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
 import Icon from "react-native-vector-icons/Feather";
+import ProductCard from "../components/ProductCard";
 
 const HomeScreen = ({ navigation }) => {
-  const Read= () => {
-		getDocs(collection(db, "products"))
-			.then((products) =>{
-				products.forEach((product) =>{
-					let doc = product
-					console.log(`${doc.id} => ${doc.data()}`);
-				})
-			})
+
+	const [productList, setProductList] = useState([]);
+	
+	useEffect(()=>{
+		Read();
+		return ()=> {
+			console.log("home ummouted");
+		}
+	}, [])
+
+  const Read= async () => {
+		const querySnapshot = await getDocs(collection(db, "products"));
+		setProductList(querySnapshot.docs.map((doc)=>(
+			{ ...doc.data(), id: doc.id }
+		)))
   };
 
  return (
@@ -31,7 +48,17 @@ const HomeScreen = ({ navigation }) => {
 					color="#EF1A69"
 				/>
 			</View>
-			<Button title="get data" onPress={Read}/>
+			<View style={styles.productsContainer}>
+				<FlatList 
+					numColumns={2}
+					contentContainerStyle={{alignItems: "center"}}
+					data={productList}
+					renderItem={({item}) => (
+						<ProductCard name={item.name} />
+					)}
+					keyExtractor={item => item.id}
+				/>
+			</View>
     </View>
   );
 };
@@ -46,6 +73,7 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     height: "100%",
+		flexDirection: "column",
   },
 	searchBar: {
 		width: "90%",
@@ -65,5 +93,17 @@ const styles = StyleSheet.create({
 		shadowOpacity: 10,
 		elevation: 2,
 		shadowRadius: 10,
-	}
+	},
+	productsContainer: {
+		width: "100%",
+		height: "80%",
+		paddingTop: 40,
+		position: "absolute",
+		bottom:65,
+		//backgroundColor: "#333",
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "row",
+		flexWrap: "wrap",
+	}, 
 });

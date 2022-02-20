@@ -15,15 +15,19 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import Icon from "react-native-vector-icons/Entypo";
+import AppLoader from "../components/AppLoader";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(true);
+	const [loggedIn, setLoggedIn] = useState(false);
+	const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged((user) => {
       if (user) {
+				setLoggedIn(true)
         navigation.replace("Home");
       }
     });
@@ -34,34 +38,27 @@ const LoginScreen = ({ navigation }) => {
       userEmail: email,
       userPassword: password,
     };
-    if (cred.userEmail != "" &&  cred.userPassword != "") {
-      const auth = new getAuth();
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCred) => {
-					navigation.navigate("Home");
-        })
-				.catch((err) =>{
-					if (err.message == "auth\/invalid-email") {
-						Alert.alert(
-							"wrong email or password",
-							"please try again."
-						)
-					}
-				})
-			setTimeout(() =>{
-				setEmail("")
-				setPassword("")
-			}, 2000)
-    } else {
-      Alert.alert(
-        "Email or Password can't be empty !.",
-        "Please renter email and password again!."
-      );
-    }
-  };
+		const auth = getAuth();
+		setLoading(true)
+		signInWithEmailAndPassword(auth, email, password)
+			.then((userCred) => {
+				setLoading(false)
+				console.log(userCred.user.email);
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setLoading(false)
+				if (error.code === "auth\/invalid-email") {
+					Alert.alert("Alert",
+						"Wrong email or password.\nPlease try again."
+					)
+				}
+			})
+	};
 
   const handleSignUp = () => {
     const auth = getAuth();
+		setLoading(true)
 		if (email != "" && password != "") {
 			if (password.length < 6){
 				return Alert.alert("Password should be at least 6 characters",
@@ -70,9 +67,11 @@ const LoginScreen = ({ navigation }) => {
 			}
 			createUserWithEmailAndPassword(auth, email, password)
 				.then((userCred) => {
+					setLoading(false)
 					const user = userCred.user;
 				})
 				.catch((error) => {
+					setLoading(false)
 					console.log(error.message);
 				});
 		} else {
@@ -84,6 +83,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
+		<>
     <KeyboardAvoidingView
       style={styles.container}
       behavior="padding"
@@ -131,7 +131,9 @@ const LoginScreen = ({ navigation }) => {
           <Text style={{ color: "#333", fontSize: 16 }}>Register</Text>
         </TouchableOpacity>
       </View>
+			{loading ? <AppLoader /> : null}
     </KeyboardAvoidingView>
+		</>
   );
 };
 
